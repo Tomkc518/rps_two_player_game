@@ -1,0 +1,48 @@
+body {
+    color: #ffa600;
+    font-family: 'Play', sans-serif;
+}
+
+.display-4 {
+    text-shadow: 2px 2px 4px #000000;
+}
+
+.lead {
+    text-decoration: underline;
+}
+
+.col-lg-3 {
+    border: 5px solid #007bff;
+    height: 20rem;
+}
+
+.form-control {
+    margin-left: 10%;
+}
+
+.chatMessage {
+    box-shadow: 2px 2px gray inset;
+}
+
+.chatbox {
+    border: 1px solid lightgray;
+    height: 30rem;
+    overflow: auto;
+}
+
+p {
+    font-size: 1.5rem;
+}
+
+#playerOne,
+#playerTwo {
+    position: relative;
+}
+
+#playerOneScore,
+#playerTwoScore {
+    bottom: 0;
+    left: -2%;
+    position: absolute;
+    width: 100%;
+}
