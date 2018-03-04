@@ -6,7 +6,7 @@ var config = {
     storageBucket: "rps-two-player-game.appspot.com",
     messagingSenderId: "879567465944"
 };
-    
+//connects to firebase   
 firebase.initializeApp(config);
 
 var database = firebase.database();
@@ -17,10 +17,12 @@ var playerOneName = "";
 var playerTwoName = "";
 var player = "";
 var chatName = "";
-
+//when entering the players name...
 $("#startButton").on("click", function() {
     event.preventDefault();
+    //check to makes sure there isn't a blank value.
     if ($("#playerName").val().trim() !== "") {
+        //if there isn't a player one already, set the name information, push the win and loss information to firebase, assign the name to the Div and set the turn to 1
         if (playerOne === false) {
             playerOneName = $("#playerName").val().trim();
             player = 1;
@@ -35,6 +37,7 @@ $("#startButton").on("click", function() {
             $("#startHeader").append("<p class='playerOneTurn'>")
             database.ref("/players/p1").onDisconnect().remove();
             database.ref().child("/turn").set(1);
+        //if there is already a player one, add a player two like above
         } else if ( (playerOne === true) && (playerTwo === false) ) {
             playerTwoName = $("#playerName").val().trim();
             player = 2;
@@ -52,8 +55,9 @@ $("#startButton").on("click", function() {
         };
     };
 });
-
+//checks if any information in changed or added in the players section of the database
 database.ref("/players").on("value", function(playerSnap){
+    //add player one information and set varabiles for DOM manipulation
     if (playerSnap.child("p1").exists()){
         playerOne = true;
         var p1 = playerSnap.val().p1;
@@ -63,11 +67,13 @@ database.ref("/players").on("value", function(playerSnap){
         playerOneLoss = p1.loss;
         $("#playerOneStatus").html("<p>" + p1.name);
         $("#playerOneScore").text("Wins: " + p1.win + " Losses: " + p1.loss);
+    //if no player one, keep screen ready for player one
     } else {
         playerOne = false;
         $("#playerOneStatus").html("<p> Waiting for Player 1");
         database.ref().child("/turn").set(0);
     };
+    //same as above for player two
     if (playerSnap.child("p2").exists()){
         playerTwo = true;
         var p2 = playerSnap.val().p2;
@@ -77,29 +83,33 @@ database.ref("/players").on("value", function(playerSnap){
         playerTwoLoss = p2.loss;
         $("#playerTwoStatus").html("<p>" + p2.name);
         $("#playerTwoScore").text("Wins: " + p2.win + " Losses: " + p2.loss);
+     //if no player two, keep screen ready for player two
     } else {
         playerTwo = false;
         $("#playerTwoStatus").html("<p> Waiting for Player 2");
         database.ref().child("/turn").set(0);
     };
+    //if there are no players, clear the chat
     if (!playerSnap.child("p2").exists() && !playerSnap.child("p2").exists()){
         database.ref("chat").remove();
     };
 });
-
+//if someone leaves, notify the other player in chat
 database.ref("/players/").on("child_removed", function(removal) {
     chat = removal.val().name + " has disconnected!";
     database.ref("/chat").push({
         chat: chat
     });
 });
-
+//check to see what turn is active
 database.ref("/turn").on("value", function(turnSnap){
     if (turnSnap.val() === 1) {
+        //if players are both set, its player's one turn.
         if (playerOne && playerTwo){
             $(".playerOneTurn").text("It's Your Turn!");
             $("#playerOne").css({"border": "5px solid yellow"});
             $(".playerTwoTurn").text("Waiting for " + playerOneName + " to choose.");
+            //only allows player one to see the choices.
             if (player === 1) {
                 $("#playerOne").append("<p class='playerChoices1' data-choice='Rock'> Rock");
                 $("#playerOne").append("<p class='playerChoices1' data-choice='Paper'> Paper");
@@ -108,6 +118,7 @@ database.ref("/turn").on("value", function(turnSnap){
         };
     };
     if (turnSnap.val() === 2) {
+        //once player one goes, it goes to turn two and player two gets the same options as above.
         if (playerOne && playerTwo){
             $("#playerOne").css({"border": "5px solid #007bff"});
             $("#playerTwo").css({"border": "5px solid yellow"});
@@ -121,6 +132,7 @@ database.ref("/turn").on("value", function(turnSnap){
         };
     };
     if (turnSnap.val() === 3) {
+        //once both have chosen the choices are compared and the winner is decided.
         $("#playerTwo").css({"border": "5px solid #007bff"});
         $("#playerOne").append("<p class='" + playerOneChoice + "'>" + playerOneChoice);
         $("#playerTwo").append("<p class='" + playerTwoChoice + "'>" + playerTwoChoice);
@@ -144,7 +156,7 @@ database.ref("/turn").on("value", function(turnSnap){
         
     };
 });
-
+//once player one chooses a choice that choice is shown to only player one and player two gets to choose.
 $(document).on('click', ".playerChoices1", function() {
     var playerChoice = $(this).attr('data-choice');
     console.log(playerChoice);
@@ -153,7 +165,7 @@ $(document).on('click', ".playerChoices1", function() {
     $("#playerOne").append("<p class='firstPlayerChoice " + playerChoice + "'>" + playerChoice);
     database.ref().child("/turn").set(2);
 });
-
+//player two gets to choose their choice in secret.
 $(document).on('click', ".playerChoices2", function() {
     var playerChoice = $(this).attr('data-choice');
     console.log(playerChoice);
@@ -162,7 +174,7 @@ $(document).on('click', ".playerChoices2", function() {
     $("#playerTwo").append("<p class='secondPlayerChoice " + playerChoice + "'>" + playerChoice);
     database.ref().child("/turn").set(3);
 });
-
+//if player one wins, increment player one's win, increment player two's loss and reset the game allowing another choice.
 function firstPlayerWins(){
     playerOneWins++;
     database.ref("/players/p1/win").set(playerOneWins);
@@ -185,7 +197,7 @@ function firstPlayerWins(){
         };
     };
 };
-
+//if player two wins, increment player twi's win, increment player one's loss and reset the game allowing another choice.
 function secondPlayerWins(){
     playerTwoWins++;
     database.ref("/players/p2/win").set(playerTwoWins);
@@ -208,7 +220,7 @@ function secondPlayerWins(){
         };
     };
 };
-
+//if the players tie they are notified of the tie, no scores change.
 function tieGame(){
     $("#gameResults").append("<p class='gameResults'> Tie");
     $("#gameResults").append("<p class='gameResults'> Game!");
@@ -227,7 +239,7 @@ function tieGame(){
         };
     };
 };
-
+//this section is for the chat box, once a message is set it labels it with the players name and pushes it to the chat database.
 $("#chatSend").on("click", function() {
     event.preventDefault();
     chat = chatName + ": " + $(".chatMessage").val().trim();
@@ -236,7 +248,7 @@ $("#chatSend").on("click", function() {
     });
     $(".chatMessage").val("");
 });
-
+//displays the chat messages
 database.ref("/chat").on("child_added", function(snapshot){
     $(".chatbox").append("<p class='ml-1'>" + snapshot.val().chat + "</p>")
 });
