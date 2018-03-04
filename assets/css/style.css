@@ -46,3 +46,30 @@ p {
     position: absolute;
     width: 100%;
 }
+
+.playerChoices1,
+.playerChoices2 {
+    cursor: pointer;
+    font-size: 2rem;
+}
+
+.Rock {
+    top: 30%;
+    left: 28%;
+    font-size: 3.5rem;
+    position: absolute;
+}
+
+.Paper {
+    top: 30%;
+    left: 25%;
+    font-size: 3.5rem;
+    position: absolute;
+}
+
+.Scissors {
+    top: 30%;
+    left: 12%;
+    font-size: 3.5rem;
+    position: absolute;
+}
