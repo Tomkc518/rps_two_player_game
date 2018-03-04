@@ -16,18 +16,7 @@ var playerTwo = false;
 var playerOneName = "";
 var playerTwoName = "";
 var player = "";
-
-$("#chatSend").on("click", function() {
-    chat = $(".chatMessage").val().trim();
-    database.ref("/chat").push({
-        chat: chat
-    });
-    $(".chatMessage").val("");
-});
-
-database.ref("/chat").on("child_added", function(snapshot){
-    $(".chatbox").append("<p class='ml-1'>" + snapshot.val().chat + "</p>")
-});
+var chatName = "";
 
 $("#startButton").on("click", function() {
     event.preventDefault();
@@ -35,6 +24,7 @@ $("#startButton").on("click", function() {
         if (playerOne === false) {
             playerOneName = $("#playerName").val().trim();
             player = 1;
+            chatName = playerOneName;
             database.ref("/players/p1").set({
                 name: playerOneName,
                 win: 0,
@@ -48,6 +38,7 @@ $("#startButton").on("click", function() {
         } else if ( (playerOne === true) && (playerTwo === false) ) {
             playerTwoName = $("#playerName").val().trim();
             player = 2;
+            chatName = playerTwoName;
             database.ref("/players/p2").set({
                 name: playerTwoName,
                 win: 0,
@@ -96,6 +87,13 @@ database.ref("/players").on("value", function(playerSnap){
     };
 });
 
+database.ref("/players/").on("child_removed", function(removal) {
+    chat = removal.val().name + " has disconnected!";
+    database.ref("/chat").push({
+        chat: chat
+    });
+});
+
 database.ref("/turn").on("value", function(turnSnap){
     if (turnSnap.val() === 1) {
         if (playerOne && playerTwo){
@@ -140,7 +138,7 @@ database.ref("/turn").on("value", function(turnSnap){
             } else if ((playerOneChoice === "Paper") && (playerTwoChoice === "Scissors")) {
                 secondPlayerWins();
             } else if (playerOneChoice === playerTwoChoice) {
-                tieGame()
+                tieGame();
             };;
         };
         
@@ -229,3 +227,16 @@ function tieGame(){
         };
     };
 };
+
+$("#chatSend").on("click", function() {
+    event.preventDefault();
+    chat = chatName + ": " + $(".chatMessage").val().trim();
+    database.ref("/chat").push({
+        chat: chat
+    });
+    $(".chatMessage").val("");
+});
+
+database.ref("/chat").on("child_added", function(snapshot){
+    $(".chatbox").append("<p class='ml-1'>" + snapshot.val().chat + "</p>")
+});
