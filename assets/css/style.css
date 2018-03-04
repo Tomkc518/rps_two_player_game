@@ -73,3 +73,7 @@ p {
     font-size: 3.5rem;
     position: absolute;
 }
+
+.gameResults {
+    font-size: 4rem;
+}

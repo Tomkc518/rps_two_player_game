@@ -101,6 +101,7 @@ database.ref("/turn").on("value", function(turnSnap){
         if (playerOne && playerTwo){
             $(".playerOneTurn").text("It's Your Turn!");
             $("#playerOne").css({"border": "5px solid yellow"});
+            $(".playerTwoTurn").text("Waiting for " + playerOneName + " to choose.");
             if (player === 1) {
                 $("#playerOne").append("<p class='playerChoices1' data-choice='Rock'> Rock");
                 $("#playerOne").append("<p class='playerChoices1' data-choice='Paper'> Paper");
@@ -127,20 +128,20 @@ database.ref("/turn").on("value", function(turnSnap){
         $("#playerTwo").append("<p class='" + playerTwoChoice + "'>" + playerTwoChoice);
         if ((playerOneChoice === "Rock") || (playerOneChoice === "Paper") || (playerOneChoice === "Scissors")) {
             if ((playerOneChoice === "Rock") && (playerTwoChoice === "Scissors")) {
-                database.ref("/players/p2").set({win: playerOneWins++,});
+                firstPlayerWins();
             } else if ((playerOneChoice === "Rock") && (playerTwoChoice === "Paper")) {
-              
+                secondPlayerWins();
             } else if ((playerOneChoice === "Scissors") && (playerTwoChoice === "Rock")) {
-              
+                secondPlayerWins();
             } else if ((playerOneChoice === "Scissors") && (playerTwoChoice === "Paper")) {
-              
+                firstPlayerWins();
             } else if ((playerOneChoice === "Paper") && (playerTwoChoice === "Rock")) {
-              
+                firstPlayerWins();
             } else if ((playerOneChoice === "Paper") && (playerTwoChoice === "Scissors")) {
-              
+                secondPlayerWins();
             } else if (playerOneChoice === playerTwoChoice) {
-              
-            };
+                tieGame()
+            };;
         };
         
     };
@@ -151,7 +152,7 @@ $(document).on('click', ".playerChoices1", function() {
     console.log(playerChoice);
     database.ref().child("/players/p1/choice").set(playerChoice);
     $(".playerChoices1").detach()
-    $("#playerOne").append("<p class='" + playerChoice + "'>" + playerChoice);
+    $("#playerOne").append("<p class='firstPlayerChoice " + playerChoice + "'>" + playerChoice);
     database.ref().child("/turn").set(2);
 });
 
@@ -160,6 +161,71 @@ $(document).on('click', ".playerChoices2", function() {
     console.log(playerChoice);
     database.ref().child("/players/p2/choice").set(playerChoice);
     $(".playerChoices2").detach()
-    $("#playerTwo").append("<p class='" + playerChoice + "'>" + playerChoice);
+    $("#playerTwo").append("<p class='secondPlayerChoice " + playerChoice + "'>" + playerChoice);
     database.ref().child("/turn").set(3);
 });
+
+function firstPlayerWins(){
+    playerOneWins++;
+    database.ref("/players/p1/win").set(playerOneWins);
+    playerTwoLoss++;
+    database.ref("/players/p2/loss").set(playerTwoLoss);
+    $("#gameResults").append("<p class='gameResults'>" + playerOneName);
+    $("#gameResults").append("<p class='gameResults'> Wins!");
+    var resultsCount = 6;
+    var resultsCounter = setInterval(resultsTimer, 1000); 
+    function resultsTimer(){
+        resultsCount -= 1;
+        if (resultsCount <= 0){
+            clearInterval(resultsCounter);
+            $(".firstPlayerChoice").detach();
+            $("." + playerOneChoice + "").detach();
+            $(".secondPlayerChoice").detach();
+            $("." + playerTwoChoice + "").detach();
+            $(".gameResults").detach();
+            database.ref().child("/turn").set(1);
+        };
+    };
+};
+
+function secondPlayerWins(){
+    playerTwoWins++;
+    database.ref("/players/p2/win").set(playerTwoWins);
+    playerOneLoss++;
+    database.ref("/players/p1/loss").set(playerOneLoss);
+    $("#gameResults").append("<p class='gameResults'>" + playerTwoName);
+    $("#gameResults").append("<p class='gameResults'> Wins!");
+    var resultsCount = 6;
+    var resultsCounter = setInterval(resultsTimer, 1000); 
+    function resultsTimer(){
+        resultsCount -= 1;
+        if (resultsCount <= 0){
+            clearInterval(resultsCounter);
+            $(".firstPlayerChoice").detach();
+            $("." + playerOneChoice + "").detach();
+            $(".secondPlayerChoice").detach();
+            $("." + playerTwoChoice + "").detach();
+            $(".gameResults").detach();
+            database.ref().child("/turn").set(1);
+        };
+    };
+};
+
+function tieGame(){
+    $("#gameResults").append("<p class='gameResults'> Tie");
+    $("#gameResults").append("<p class='gameResults'> Game!");
+    var resultsCount = 6;
+    var resultsCounter = setInterval(resultsTimer, 1000); 
+    function resultsTimer(){
+        resultsCount -= 1;
+        if (resultsCount <= 0){
+            clearInterval(resultsCounter);
+            $(".firstPlayerChoice").detach();
+            $("." + playerOneChoice + "").detach();
+            $(".secondPlayerChoice").detach();
+            $("." + playerTwoChoice + "").detach();
+            $(".gameResults").detach();
+            database.ref().child("/turn").set(1);
+        };
+    };
+};
