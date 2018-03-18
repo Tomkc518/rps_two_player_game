@@ -159,7 +159,6 @@ database.ref("/turn").on("value", function(turnSnap){
 //once player one chooses a choice that choice is shown to only player one and player two gets to choose.
 $(document).on('click', ".playerChoices1", function() {
     var playerChoice = $(this).attr('data-choice');
-    console.log(playerChoice);
     database.ref().child("/players/p1/choice").set(playerChoice);
     $(".playerChoices1").detach()
     $("#playerOne").append("<p class='firstPlayerChoice " + playerChoice + "'>" + playerChoice);
@@ -168,12 +167,20 @@ $(document).on('click', ".playerChoices1", function() {
 //player two gets to choose their choice in secret.
 $(document).on('click', ".playerChoices2", function() {
     var playerChoice = $(this).attr('data-choice');
-    console.log(playerChoice);
     database.ref().child("/players/p2/choice").set(playerChoice);
     $(".playerChoices2").detach()
     $("#playerTwo").append("<p class='secondPlayerChoice " + playerChoice + "'>" + playerChoice);
     database.ref().child("/turn").set(3);
 });
+//clears the board after the results are shown after a 6 second delay
+function clearBoard(){
+    $(".firstPlayerChoice").detach();
+    $("." + playerOneChoice + "").detach();
+    $(".secondPlayerChoice").detach();
+    $("." + playerTwoChoice + "").detach();
+    $(".gameResults").detach();
+    database.ref().child("/turn").set(1);
+};
 //if player one wins, increment player one's win, increment player two's loss and reset the game allowing another choice.
 function firstPlayerWins(){
     playerOneWins++;
@@ -188,12 +195,7 @@ function firstPlayerWins(){
         resultsCount -= 1;
         if (resultsCount <= 0){
             clearInterval(resultsCounter);
-            $(".firstPlayerChoice").detach();
-            $("." + playerOneChoice + "").detach();
-            $(".secondPlayerChoice").detach();
-            $("." + playerTwoChoice + "").detach();
-            $(".gameResults").detach();
-            database.ref().child("/turn").set(1);
+            clearBoard();
         };
     };
 };
@@ -211,12 +213,7 @@ function secondPlayerWins(){
         resultsCount -= 1;
         if (resultsCount <= 0){
             clearInterval(resultsCounter);
-            $(".firstPlayerChoice").detach();
-            $("." + playerOneChoice + "").detach();
-            $(".secondPlayerChoice").detach();
-            $("." + playerTwoChoice + "").detach();
-            $(".gameResults").detach();
-            database.ref().child("/turn").set(1);
+            clearBoard();
         };
     };
 };
@@ -230,12 +227,7 @@ function tieGame(){
         resultsCount -= 1;
         if (resultsCount <= 0){
             clearInterval(resultsCounter);
-            $(".firstPlayerChoice").detach();
-            $("." + playerOneChoice + "").detach();
-            $(".secondPlayerChoice").detach();
-            $("." + playerTwoChoice + "").detach();
-            $(".gameResults").detach();
-            database.ref().child("/turn").set(1);
+            clearBoard();
         };
     };
 };

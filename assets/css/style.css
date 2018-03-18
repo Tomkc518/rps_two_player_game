@@ -7,6 +7,12 @@ body {
     text-shadow: 2px 2px 4px #000000;
 }
 
+.jumbotron {
+    -webkit-box-shadow: 0 5px 5px #888888;
+    -moz-box-shadow: 0 5px 5px #888888;
+    box-shadow: 0 5px 5px #888888;
+}
+
 .lead {
     text-decoration: underline;
 }
@@ -53,27 +59,17 @@ p {
     font-size: 2rem;
 }
 
-.Rock {
-    top: 30%;
-    left: 28%;
-    font-size: 3.5rem;
-    position: absolute;
-}
-
-.Paper {
-    top: 30%;
-    left: 25%;
-    font-size: 3.5rem;
-    position: absolute;
-}
-
+.Rock,
+.Paper,
 .Scissors {
-    top: 30%;
-    left: 12%;
     font-size: 3.5rem;
+    left: 0;
     position: absolute;
+    top: 30%;
+    width: 100%;
 }
 
 .gameResults {
-    font-size: 4rem;
+    font-size: 3.5rem;
+    width: 100%;
 }
