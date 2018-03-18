@@ -4,7 +4,7 @@ Challenge someone to RPS!
 
 This game can be played by any two people from over the web, also mobile friendly.
 
-Game: https://tomkc518.github.io/rps_two_player_game/
+[Game](https://tomkc518.github.io/rps_two_player_game/)
 
 This game was super challenging for me. It is the first time using firebase or any database for that matter
 
